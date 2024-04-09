@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Lines by Bracket Content</title>
+    <style>
+        /* Inline CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Center align elements */
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+            position: relative; /* Needed for animation */
+            animation: slide-in 1s ease forwards;
+        }
+        @keyframes slide-in {
+            0% {
+                transform: translateY(-50px); /* Initial position off the screen */
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0); /* Final position */
+                opacity: 1;
+            }
+        }
+        h3 {
+            font-size: 18px;
+            color: #333;
+            text-align: left; /* Align group titles to the left */
+        }
+        p {
+            color: #666;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            transition: all 0.3s ease;
+            text-align: left; /* Align textarea content to the left */
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:active {
+            background-color: black;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .container:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+        .group-link {
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .groupDiv {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: left; /* Align group content to the left */
+        }
+        .groupDiv:hover {
+            background-color: #e9e9e9;
+        }
+        .groupDiv h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 18px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        ul li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            transition: all 0.3s ease;
+            text-align: left; /* Align list items to the left */
+        }
+        ul li:hover {
+            background-color: #f5f5f5;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .poweredBy {
+            margin-top: 20px;
+            font-style: italic;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Subdomain Reconnaissance Helping Software</h1>
+        <p>Paste the whole results you got from SubFinder</p>
+        <textarea id="userInput" rows="10" placeholder="Enter your lines here..."></textarea>
+        <button onclick="groupLines()" id="groupButton">DECORATE</button>
+        <div id="output"></div>
+        <div class="poweredBy">Powered by Professor Cyber Agency</div>
+    </div>
+
+    <script>
+        function groupLinesByBracketContent(input) {
+            const lines = input.split('\n');
+            const groups = {};
+
+            lines.forEach(line => {
+                const match = line.match(/\[(.*?)\]/); // Regular expression to match content within brackets
+                if (match) {
+                    const content = match[1]; // Extract content within brackets
+                    if (!groups[content]) {
+                        groups[content] = [];
+                    }
+                    groups[content].push(line); // Push line to corresponding group
+                }
+            });
+
+            return groups;
+        }
+
+        function groupLines() {
+            const userInput = document.getElementById("userInput").value;
+            const groupedLines = groupLinesByBracketContent(userInput);
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = ""; // Clear previous output
+
+            // Display grouped lines
+            for (const content in groupedLines) {
+                if (groupedLines.hasOwnProperty(content)) {
+                    const lines = groupedLines[content];
+                    const groupDiv = document.createElement("div");
+                    groupDiv.classList.add("groupDiv");
+                    const ul = document.createElement("ul");
+                    lines.forEach(line => {
+                        const li = document.createElement("li");
+                        const parts = line.split(/\b(https?:\/\/\S+)\b/); // Split line by URLs
+                        parts.forEach(part => {
+                            if (part.match(/\b(https?:\/\/\S+)\b/)) {
+                                const a = document.createElement("a");
+                                a.href = part;
+                                a.target = "_blank"; // Open link in a new tab
+                                a.textContent = part;
+                                li.appendChild(a);
+                                // Add event listener to change link color and add animation
+                                a.addEventListener("click", function() {
+                                    this.style.color = "black";
+                                    this.style.transition = "all 0.3s ease";
+                                });
+                            } else {
+                                li.appendChild(document.createTextNode(part));
+                            }
+                        });
+                        ul.appendChild(li);
+                    });
+                    groupDiv.innerHTML = "<h3>Group [" + content + "] (" + lines.length + " lines)</h3>";
+                    groupDiv.appendChild(ul);
+
+                    // Add button to open all links in group
+                    const openAllButton = document.createElement("button");
+                    openAllButton.textContent = "Open All Links";
+                    openAllButton.classList.add("openAllButton");
+                    openAllButton.onclick = function() {
+                        openAllLinks(lines);
+                        // Change button color and add animation
+                        this.style.backgroundColor = "black";
+                        this.style.color = "white";
+                        this.style.transition = "all 0.3s ease";
+                    };
+                    groupDiv.appendChild(openAllButton);
+
+                    outputDiv.appendChild(groupDiv);
+                }
+            }
+
+            // Change color and add animation to Group Lines button
+            const groupButton = document.getElementById("groupButton");
+            groupButton.style.backgroundColor = "black";
+            groupButton.style.color = "white";
+            groupButton.style.transition = "all 0.3s ease";
+        }
+
+        function openAllLinks(lines) {
+            const links = lines.flatMap(line => {
+                const match = line.match(/\b(https?:\/\/\S+)\b/g); // Match all URLs in the line
+                return match ? match : [];
+            });
+
+            links.forEach(link => {
+                window.open(link, "_blank");
+            });
+        }
+    </script>
+</body>
+</html>
